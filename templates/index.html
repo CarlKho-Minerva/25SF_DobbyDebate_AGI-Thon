@@ -7,6 +7,13 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    <header class="debate-header">
+        <div class="debate-branding">
+            <h1>🏛️ Presidential Debate: You vs. Dobby</h1>
+            <p class="debate-tagline">"Making Wizarding Politics Great Again!"</p>
+        </div>
+    </header>
+
     <div class="app-container">
         <div class="debate-grid">
             <!-- User container -->
@@ -38,6 +45,21 @@
             <div class="transcript" id="userTranscript"></div>
         </div>
     </div>
+
+    <footer class="debate-footer">
+        <div class="roadmap">
+            <h3>🗺️ The Campaign Trail</h3>
+            <p>Coming Soon to Twitter:</p>
+            <ul>
+                <li>🎥 1-minute viral debate clips</li>
+                <li>💰 Entry fee debates with prize pools</li>
+                <li>🗳️ Community voting via Twitter polls</li>
+                <li>🏆 Double-or-nothing winnings</li>
+            </ul>
+            <p class="footer-quote">"Dobby never meant to kill. Dobby only meant to roast them severely." 🧦</p>
+        </div>
+    </footer>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>

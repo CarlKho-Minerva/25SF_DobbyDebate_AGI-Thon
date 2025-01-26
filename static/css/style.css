@@ -5,6 +5,8 @@
     --text: #dcddde;
     --status-online: #3ba55c;
     --status-active: #faa61a;
+    --presidential-red: #bf0a30;
+    --presidential-blue: #002868;
 }
 
 body {
@@ -282,4 +284,73 @@ body {
 
 .user-wrapper.speaking {
     box-shadow: 0 0 20px var(--status-online);
+}
+
+.debate-header {
+    text-align: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--presidential-red), var(--presidential-blue));
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.debate-branding h1 {
+    color: white;
+    font-size: 2.5rem;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.debate-tagline {
+    color: rgba(255, 255, 255, 0.9);
+    font-style: italic;
+    margin-top: 0.5rem;
+}
+
+.debate-footer {
+    margin-top: 4rem;
+    padding: 2rem;
+    background: var(--secondary-bg);
+    border-top: 3px solid var(--accent);
+}
+
+.roadmap {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.roadmap ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+}
+
+.roadmap li {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: transform 0.2s;
+}
+
+.roadmap li:hover {
+    transform: translateY(-2px);
+}
+
+.footer-quote {
+    font-style: italic;
+    color: var(--accent);
+    margin-top: 2rem;
+}
+
+/* Update user image styles */
+.user-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
 }
