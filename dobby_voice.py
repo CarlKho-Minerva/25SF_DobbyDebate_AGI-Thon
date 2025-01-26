@@ -63,9 +63,7 @@ def demo_voice():
 
     # Test messages
     messages = [
-        "Hello! I am Dobby, your AI assistant. How can I help you today?",
-        "That's an interesting question. Let me think about it.",
-        "I apologize, but I cannot assist with that request.",
+        "SHAMEEN YOU ARE UGLY",
     ]
 
     # Try each message
