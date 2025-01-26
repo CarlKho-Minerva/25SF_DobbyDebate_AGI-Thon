@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dobby Debate</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/dobby.png') }}">
 </head>
 
 <body>
@@ -20,7 +21,8 @@
                 <!-- User container -->
                 <div class="participant-container">
                     <div class="user-wrapper">
-                        <img src="https://pbs.twimg.com/media/Ej9HDDQX0Ac1Hjw.png" alt="User" class="user-image">
+                        <video id="userVideo" autoplay playsinline muted></video>
+                        <img src="https://pbs.twimg.com/media/Ej9HDDQX0Ac1Hjw.png" alt="User" class="user-image fallback">
                         <div class="status-indicator online"></div>
                     </div>
                     <div class="participant-name">You</div>
@@ -45,6 +47,14 @@
         <!-- Right Column: Controls Only -->
         <div class="control-section">
             <div class="control-wrapper">
+                <div class="instructions-section">
+                    <ol>
+                        <li>Choose a random topic below</li>
+                        <li>Click the speak button (auto-records for 5 seconds)</li>
+                        <li>Wait for Dobby to respond</li>
+                        <!-- <li>Win ETH: Pay 0.01 ETH → Twitter vote → Winner takes 0.02 ETH</li> -->
+                    </ol>
+                </div>
                 <div class="debate-topic-section">
                     <span class="topic-label">TOPIC</span>
                     <h2 id="currentTopic" class="debate-topic">Select a topic to begin</h2>
@@ -59,20 +69,60 @@
                         Click to Speak
                     </button>
                 </div>
-                <div class="instructions-section">
-                    <ol>
-                        <li>Choose a random topic above</li>
-                        <li>Click the speak button (auto-records for 5 seconds)</li>
-                        <li>Wait for Dobby to respond</li>
-                        <li>Win ETH: Pay 0.01 ETH → Twitter vote → Winner takes 0.02 ETH</li>
-                    </ol>
+                <div class="future-plans-section">
+                    <button id="futurePlans" class="future-plans-button subtle">
+                        <span class="button-icon">💡</span>
+                        Future Plans (Community Voting)
+                    </button>
+                    <div class="minimal-footer">
+                        Made with angst by <a href="https://www.linkedin.com/in/carlkho/">Carl</a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Add minimal footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            Made with ❤️ and angst by
+            <a href="https://www.linkedin.com/in/carlkho/" target="_blank">Carl Kho</a>
+            <span class="separator">|</span>
+            <a href="https://github.com/carlkho-sf" target="_blank">GitHub</a>
+            <span class="separator">|</span>
+            <span class="footer-tag">sf'25</span>
+        </div>
+    </footer>
+
     <div class="overlay" id="timerOverlay">
-        <div class="timer-display"></div>
+        <div class="countdown-container">
+            <div class="countdown-message">You have 5 seconds to speak</div>
+            <div class="timer-display"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="futureModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>🚀 Future Plans</h2>
+            <div class="modal-body">
+                <h3>Twitter Integration (Work in Progress)</h3>
+                <ol>
+                    <li>Connect your wallet & Twitter</li>
+                    <li>Pay 0.01 ETH to start a debate</li>
+                    <li>Your 1-minute debate gets posted to Twitter</li>
+                    <li>Community votes for 24 hours</li>
+                    <li>Winner takes 0.02 ETH prize</li>
+                </ol>
+                <div class="example-section"></div>
+                    <h3>Example Scenario</h3>
+                    <p>You debate Dobby on "AI will replace developers". Your witty exchange gets posted to @DobbyDebates. The crypto-twitter community votes, and if you win, you get double your ETH back!</p>
+                </div>
+                <div class="development-note">
+                    <p>🛠️ Note: These features are under active development. For now, enjoy free debates with Dobby!</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>

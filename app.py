@@ -42,6 +42,14 @@ def emit_timer(seconds: int) -> None:
         time.sleep(1)
     socketio.emit("timer_update", {"seconds": 0})
 
+def debug_log(msg_type: str, message: str, data: dict = None) -> None:
+    """Enhanced debug logging"""
+    timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
+    log_msg = f"[{timestamp}] {msg_type}: {message}"
+    if data:
+        log_msg += f"\nData: {data}"
+    logger.info(log_msg)
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -52,6 +60,7 @@ def handle_recording():
     """Handle recording with optimized response flow"""
     try:
         current_topic = request.args.get('topic', 'Debate this topic')
+        debug_log("INFO", "Starting recording session", {"topic": current_topic})
         socketio.emit("recording_started")
 
         # Process audio and get response
@@ -63,6 +72,10 @@ def handle_recording():
         )
 
         if transcription and ai_response:
+            debug_log("INFO", "Got response", {
+                "transcription_length": len(transcription),
+                "response_length": len(ai_response)
+            })
             audio = text_to_speech(ai_response)
             if audio:
                 socketio.emit(
@@ -74,9 +87,11 @@ def handle_recording():
                     }
                 )
                 play(audio)
+        else:
+            debug_log("ERROR", "No response generated")
 
     except Exception as e:
-        logger.error(f"Recording error: {str(e)}")
+        debug_log("ERROR", f"Recording failed: {str(e)}")
         socketio.emit("error", {"message": "Recording failed"})
 
 if __name__ == "__main__":

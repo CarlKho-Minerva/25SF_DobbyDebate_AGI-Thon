@@ -69,13 +69,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   button.addEventListener("click", () => {
     if (!isRecording && !button.disabled) {
+        debugLog('INFO', 'Starting recording session');
         isRecording = true;
         button.disabled = true;
         userStatus.textContent = '🎙️ Recording...';
         button.classList.add('recording');
 
-        // Show overlay with timer
         overlay.classList.add('active');
+        const messageEl = document.querySelector('.countdown-message');
+        messageEl.innerHTML = 'Speak now!<br><small>Recording for 5 seconds...</small>';
         let timeLeft = 5;
 
         const countdown = setInterval(() => {
@@ -120,13 +122,13 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   socket.on("connect_error", (error) => {
-    console.error("Connection error:", error);
+    debugLog('ERROR', 'Connection failed', error);
     button.disabled = false;
     updateUserStatus(false);
   });
 
   socket.on("error", (data) => {
-    console.error("Server error:", data.message);
+    debugLog('ERROR', 'Server error', data);
     button.disabled = false;
     updateUserStatus(false);
     userStatus.textContent = '❌ Error';
@@ -139,4 +141,64 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById('startDebate').disabled = true;
 
   document.getElementById('randomTopic').addEventListener('click', updateTopic);
+
+  // Modal functionality
+  const futureModal = document.getElementById('futureModal');
+  const futurePlansBtn = document.getElementById('futurePlans');
+  const closeModal = document.querySelector('.close-modal');
+
+  futurePlansBtn.addEventListener('click', () => {
+      futureModal.classList.add('active');
+  });
+
+  closeModal.addEventListener('click', () => {
+      futureModal.classList.remove('active');
+  });
+
+  futureModal.addEventListener('click', (e) => {
+      if (e.target === futureModal) {
+          futureModal.classList.remove('active');
+      }
+  });
+
+  // Improve debug logging
+  function debugLog(type, message, data = null) {
+      const timestamp = new Date().toISOString();
+      const logMessage = `[${timestamp}] ${type}: ${message}`;
+
+      if (data) {
+          console.log(logMessage, data);
+      } else {
+          console.log(logMessage);
+      }
+  }
+
+  // Camera handling
+  async function initCamera() {
+    const videoElement = document.getElementById('userVideo');
+    const fallbackImage = document.querySelector('.user-image.fallback');
+
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                width: 260,
+                height: 260,
+                facingMode: "user"
+            }
+        });
+
+        videoElement.srcObject = stream;
+        await videoElement.play();
+
+        videoElement.style.display = 'block';
+        fallbackImage.style.display = 'none';
+        debugLog('INFO', 'Camera initialized successfully');
+    } catch (err) {
+        debugLog('WARN', 'Camera access denied or not available', err);
+        fallbackImage.style.display = 'block';
+    }
+  }
+
+  // Initialize camera when page loads
+  window.addEventListener('load', initCamera);
 });
