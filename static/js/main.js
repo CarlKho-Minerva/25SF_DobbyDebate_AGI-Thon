@@ -1,5 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const socket = io();
+  const socket = io({
+    transports: ["websocket"],
+    pingTimeout: 60000,
+  });
+
   const button = document.getElementById("startDebate");
   const userStatus = document.getElementById("userStatus");
   const dobbyStatus = document.getElementById("dobbyStatus");
@@ -7,32 +11,47 @@ document.addEventListener("DOMContentLoaded", () => {
   const userTranscript = document.getElementById("userTranscript");
   const dobbyResponse = document.getElementById("dobbyResponse");
 
+  let isRecording = false;
+
   function updateUserStatus(speaking) {
+    isRecording = speaking;
     userStatus.textContent = speaking ? "🎙️ Speaking..." : "🎙️ Ready";
     userStatus.classList.toggle("speaking", speaking);
-    document
+    const indicator = document
       .querySelector(".user")
-      .parentElement.querySelector(".status-indicator")
-      .classList.toggle("speaking", speaking);
+      .parentElement.querySelector(".status-indicator");
+    indicator.classList.toggle("speaking", speaking);
+    indicator.style.borderColor = speaking ? "#f04747" : "var(--secondary-bg)";
   }
 
   function updateDobbyStatus(speaking) {
     dobbyStatus.textContent = speaking ? "🔊 Speaking..." : "🔊 Ready";
     dobbyStatus.classList.toggle("speaking", speaking);
-    document
+    const indicator = document
       .querySelector(".dobby")
-      .parentElement.querySelector(".status-indicator")
-      .classList.toggle("speaking", speaking);
+      .parentElement.querySelector(".status-indicator");
+    indicator.classList.toggle("speaking", speaking);
+    indicator.style.borderColor = speaking ? "#3ba55c" : "var(--secondary-bg)";
   }
 
   button.addEventListener("click", () => {
-    button.disabled = true;
+    if (!isRecording) {
+      button.disabled = true;
+      updateUserStatus(true);
+      socket.emit("start_recording");
+    }
+  });
+
+  socket.on("recording_started", (data) => {
     updateUserStatus(true);
-    socket.emit("start_recording");
+    timer.style.display = "block";
   });
 
   socket.on("timer_update", (data) => {
-    timer.textContent = data.seconds;
+    timer.textContent = data.seconds || "";
+    if (data.seconds === 0) {
+      updateUserStatus(false);
+    }
   });
 
   socket.on("dobby_response", (data) => {
@@ -43,9 +62,21 @@ document.addEventListener("DOMContentLoaded", () => {
     dobbyResponse.textContent = data.text;
     updateDobbyStatus(true);
 
-    // Reset Dobby's status after speech ends (approximate duration)
+    // Reset Dobby's status after speech ends
     setTimeout(() => {
       updateDobbyStatus(false);
-    }, 5000); // Adjust based on typical response length
+    }, 5000);
+  });
+
+  socket.on("connect_error", (error) => {
+    console.error("Connection error:", error);
+    button.disabled = false;
+    updateUserStatus(false);
+  });
+
+  socket.on("error", (data) => {
+    console.error("Server error:", data.message);
+    button.disabled = false;
+    updateUserStatus(false);
   });
 });

@@ -77,7 +77,15 @@ body {
 
 .status-indicator.speaking {
     background-color: #f04747;
+    border-color: #f04747;
+    box-shadow: 0 0 10px rgba(240, 71, 71, 0.5);
     animation: pulse 1s infinite;
+}
+
+.dobby .status-indicator.speaking {
+    background-color: #3ba55c;
+    border-color: #3ba55c;
+    box-shadow: 0 0 10px rgba(59, 165, 92, 0.5);
 }
 
 .participant-name {
@@ -127,6 +135,7 @@ body {
     font-weight: bold;
     color: var(--accent);
     margin-top: 1rem;
+    display: none;
 }
 
 .response-text {
@@ -160,7 +169,16 @@ body {
 }
 
 @keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.1);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }

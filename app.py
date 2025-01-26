@@ -5,40 +5,65 @@ from dobby_voice import text_to_speech, play
 import threading
 import time
 
+# Initialize Flask
 app = Flask(__name__)
-socketio = SocketIO(app)
 
-@app.route('/')
+# Configure SocketIO with threading mode
+socketio = SocketIO(
+    app, cors_allowed_origins="*", async_mode="threading", ping_timeout=60
+)
+
+
+@app.route("/")
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
 
-def send_audio_to_client(audio_data):
-    socketio.emit('dobby_speaking', {'audio': audio_data})
 
-@socketio.on('start_recording')
+@socketio.on("start_recording")
 def handle_recording():
-    # Start 5-second timer
-    for i in range(5, 0, -1):
-        socketio.emit('timer_update', {'seconds': i})
-        time.sleep(1)
+    try:
+        # Emit recording start
+        socketio.emit("recording_started", {"status": "started"})
 
-    transcription, ai_response = process_audio_and_chat(
-        prompt="Conversation with user",
-        timed_recording=True,
-        record_seconds=5,
-        is_english=True
-    )
+        # Start timer in background thread
+        def timer_thread():
+            for i in range(5, 0, -1):
+                socketio.emit("timer_update", {"seconds": i})
+                time.sleep(1)
+            socketio.emit("timer_update", {"seconds": 0})
 
-    if transcription and ai_response:
-        # Convert AI response to speech
-        audio = text_to_speech(ai_response)
-        if audio:
-            socketio.emit('dobby_response', {
-                'text': ai_response,
-                'user_said': transcription
-            })
-            # Play audio in background
-            threading.Thread(target=play, args=(audio,)).start()
+        timer = threading.Thread(target=timer_thread)
+        timer.daemon = True
+        timer.start()
 
-if __name__ == '__main__':
-    socketio.run(app, debug=True)
+        # Process audio in main thread
+        transcription, ai_response = process_audio_and_chat(
+            prompt="Conversation with user",
+            timed_recording=True,
+            record_seconds=5,
+            is_english=True,
+        )
+
+        if transcription and ai_response:
+            # Convert AI response to speech
+            audio = text_to_speech(ai_response)
+            if audio:
+                socketio.emit(
+                    "dobby_response", {"text": ai_response, "user_said": transcription}
+                )
+                # Play audio in background
+                player = threading.Thread(target=play, args=(audio,))
+                player.daemon = True
+                player.start()
+
+    except Exception as e:
+        print(f"Error in handle_recording: {e}")
+        socketio.emit("error", {"message": str(e)})
+
+
+if __name__ == "__main__":
+    try:
+        print("Starting server...")
+        socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
+    except Exception as e:
+        print(f"Server error: {e}")
