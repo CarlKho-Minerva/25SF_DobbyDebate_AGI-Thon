@@ -23,6 +23,7 @@
                         <img src="https://pbs.twimg.com/media/Ej9HDDQX0Ac1Hjw.png" alt="User" class="user-image">
                         <div class="status-indicator online"></div>
                     </div>
+                    <div class="participant-name">You</div>
                     <div class="mic-status" id="userStatus">🎙️ Ready</div>
                     <div class="timer" id="recordingTimer"></div>
                     <div class="transcript user-transcript" id="userTranscript"></div>
@@ -34,6 +35,7 @@
                         <img src="{{ url_for('static', filename='images/dobby.png') }}" alt="Dobby" class="dobby-image">
                         <div class="status-indicator active"></div>
                     </div>
+                    <div class="participant-name">Dobby</div>
                     <div class="mic-status" id="dobbyStatus">🔊 Ready</div>
                     <div class="transcript dobby-transcript" id="dobbyResponse"></div>
                 </div>
@@ -54,19 +56,23 @@
                 <div class="speak-control">
                     <button id="startDebate" class="debate-button" disabled>
                         <span class="button-icon">🎙️</span>
-                        Press to Speak
+                        Click to Speak
                     </button>
                 </div>
                 <div class="instructions-section">
                     <ol>
                         <li>Choose a random topic above</li>
-                        <li>Hold the speak button to record (5s max)</li>
-                        <li>Release to let Dobby respond</li>
+                        <li>Click the speak button (auto-records for 5 seconds)</li>
+                        <li>Wait for Dobby to respond</li>
                         <li>Win ETH: Pay 0.01 ETH → Twitter vote → Winner takes 0.02 ETH</li>
                     </ol>
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="overlay" id="timerOverlay">
+        <div class="timer-display"></div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>

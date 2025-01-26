@@ -64,22 +64,34 @@ document.addEventListener("DOMContentLoaded", () => {
     dobbyWrapper.classList.toggle("speaking", speaking);
   }
 
-  button.addEventListener("mousedown", () => {
-    if (!isRecording && !button.disabled) {
-      isRecording = true;
-      button.disabled = true;  // Prevent multiple triggers
-      userStatus.textContent = '🎙️ Recording...';
-      button.classList.add('recording');
-      socket.emit('start_recording');
-    }
-  });
+  const overlay = document.getElementById('timerOverlay');
+  const timerDisplay = document.querySelector('.timer-display');
 
-  button.addEventListener("mouseup", () => {
-    if (isRecording) {
-      isRecording = false;
-      userStatus.textContent = '🎙️ Ready';
-      button.classList.remove('recording');
-      // Button stays disabled until Dobby responds
+  button.addEventListener("click", () => {
+    if (!isRecording && !button.disabled) {
+        isRecording = true;
+        button.disabled = true;
+        userStatus.textContent = '🎙️ Recording...';
+        button.classList.add('recording');
+
+        // Show overlay with timer
+        overlay.classList.add('active');
+        let timeLeft = 5;
+
+        const countdown = setInterval(() => {
+            timerDisplay.textContent = timeLeft;
+            timeLeft--;
+
+            if (timeLeft < 0) {
+                clearInterval(countdown);
+                overlay.classList.remove('active');
+                isRecording = false;
+                userStatus.textContent = '🎙️ Ready';
+                button.classList.remove('recording');
+            }
+        }, 1000);
+
+        socket.emit('start_recording');
     }
   });
 
@@ -103,6 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
         updateDobbyStatus(false);
         button.disabled = false;  // Re-enable button after Dobby responds
         dobbyResponse.classList.remove('speaking');
+        overlay.classList.remove('active');
     }, 5000);
   });
 
