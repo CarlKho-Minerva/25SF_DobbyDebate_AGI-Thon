@@ -99,6 +99,7 @@ body {
     font-size: 0.875rem;
     font-weight: 500;
     transition: all 0.2s;
+    cursor: pointer;
 }
 
 .topic-button:hover {
@@ -221,6 +222,7 @@ body {
     min-width: 200px;
     animation: button-pulse 2s infinite;
     width: 100%;
+    cursor: pointer;
 }
 
 .debate-button:hover {
@@ -750,6 +752,28 @@ body {
         border-color: var(--status-online);
         box-shadow: 0 0 5px var(--status-online);
     }
+}
+
+button {
+    cursor: pointer;
+}
+
+.instructions-section {
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+}
+
+.instructions-section ol {
+    margin: 0;
+    padding-left: 25px;
+    color: #fff;
+    line-height: 1.6;
+}
+
+.instructions-section li {
+    margin: 8px 0;
 }
 
 /* ...rest of existing styles... */

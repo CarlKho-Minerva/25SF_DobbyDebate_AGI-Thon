@@ -5,6 +5,10 @@ import os
 import wave
 import tempfile
 import time
+from dataclasses import dataclass
+from typing import Optional, Tuple
+import logging
+from functools import wraps
 
 # External package imports - with error handling
 try:
@@ -39,6 +43,37 @@ from config import (
     AUDIO_DEFAULT_DURATION,
 )
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+@dataclass
+class AudioConfig:
+    """Audio configuration settings"""
+    sample_rate: int = AUDIO_SAMPLE_RATE
+    channels: int = AUDIO_CHANNELS
+    chunk_size: int = AUDIO_CHUNK_SIZE
+    format: str = AUDIO_FORMAT
+    default_duration: int = AUDIO_DEFAULT_DURATION
+
+def error_handler(func):
+    """Decorator for consistent error handling"""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            logger.error(f"Error in {func.__name__}: {str(e)}")
+            return None
+    return wrapper
+
+def optimize_response(response: str) -> str:
+    """Optimize AI response to be concise (2-3 sentences)"""
+    sentences = response.split('. ')
+    if len(sentences) > 3:
+        optimized = '. '.join(sentences[:3]) + '.'
+        return optimized
+    return response
 
 def extract_content(response: dict) -> str:
     """Extract just the content from the API response"""
@@ -46,19 +81,12 @@ def extract_content(response: dict) -> str:
         return None
     return response["choices"][0]["message"]["content"]
 
-
-def send_chat_message(message_content: str) -> str:
-    """Send a chat message to the API and return just the response content"""
-    system_prompt = """You are Dobby, an aggressive and passionate AI debater. Clever burn comebacks.
-    Your responses should follow the SEXI template:
-    1. State your position clearly.
-    2. Explain your reasoning with strong, assertive arguments
-    3. Provide concrete eXamples or evidence to support your position
-    4. Describe the Impact or importance of your argument
-
-    You respond briefly. Presidentail debate basically. Keep the aggressive swearing Dobby in though. Be conversational level brief and to the point. Burn but dont overdo it!
-    No need to strictly follow the template tho. Focus on wit and wow-ing the audience.
-    """
+@error_handler
+def send_chat_message(message_content: str) -> Optional[str]:
+    """Send a chat message to the API with optimized response"""
+    system_prompt = """You are Dobby, a witty AI debater. Keep responses extremely brief - maximum 3 sentences.
+    Focus on one strong argument with a clever comeback. Be assertive but concise.
+    Format: State your position + One supporting point + Optional witty remark"""
 
     data = {
         "model": MODEL,
@@ -66,7 +94,8 @@ def send_chat_message(message_content: str) -> str:
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": message_content},
         ],
-        "temperature": 0.8,  # Increase temperature for more aggressive responses
+        "temperature": 0.7,
+        "max_tokens": 100  # Limit response length
     }
 
     cmd = [
@@ -84,11 +113,10 @@ def send_chat_message(message_content: str) -> str:
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         response = json.loads(result.stdout)
-        return extract_content(response)
+        return optimize_response(extract_content(response))
     except subprocess.CalledProcessError as e:
-        print("Error:", e.stderr)
+        logger.error(f"Error in send_chat_message: {e.stderr}")
         return None
-
 
 def record_audio(timed_recording=False, record_seconds=AUDIO_DEFAULT_DURATION):
     """Records audio from the microphone.
@@ -137,7 +165,6 @@ def record_audio(timed_recording=False, record_seconds=AUDIO_DEFAULT_DURATION):
 
     return temp_file_name
 
-
 def transcribe_audio_file(file_name, prompt=""):
     """Transcribes an audio file using OpenAI's Whisper API."""
     client = OpenAI(api_key=OPENAI_API_KEY)
@@ -148,9 +175,8 @@ def transcribe_audio_file(file_name, prompt=""):
             )
             return response.text.strip()
     except Exception as e:
-        print(f"Transcription error: {e}")
+        logger.error(f"Transcription error: {e}")
         return None
-
 
 def translate_audio_file(file_name, prompt=""):
     """Translates an audio file to English using OpenAI's Whisper API."""
@@ -162,9 +188,8 @@ def translate_audio_file(file_name, prompt=""):
             )
             return response.text.strip()
     except Exception as e:
-        print(f"Translation error: {e}")
+        logger.error(f"Translation error: {e}")
         return None
-
 
 def process_audio(
     prompt="",
@@ -187,14 +212,16 @@ def process_audio(
         if os.path.exists(temp_file_name):
             os.remove(temp_file_name)
 
-
+@error_handler
 def process_audio_and_chat(
-    prompt="Let's debate this topic.",  # Updated default prompt
-    timed_recording=False,
-    record_seconds=AUDIO_DEFAULT_DURATION,
-    is_english=True,
-):
-    """Records audio, transcribes it, and gets AI response"""
+    prompt: str = "Let's debate this topic.",
+    timed_recording: bool = False,
+    record_seconds: int = AudioConfig.default_duration,
+    is_english: bool = True,
+) -> Tuple[Optional[str], Optional[str]]:
+    """Process audio and get optimized AI response"""
+    start_time = time.time()
+
     transcription = process_audio(
         prompt=prompt,
         timed_recording=timed_recording,
@@ -203,13 +230,12 @@ def process_audio_and_chat(
     )
 
     if transcription:
-        print("\nYou said:", transcription)
-        # Enhance the transcription with debate context
-        debate_prompt = f"Debate this point: {transcription}"
+        logger.info(f"Transcription completed in {time.time() - start_time:.2f}s")
+        debate_prompt = f"Respond to this point briefly: {transcription}"
         ai_response = send_chat_message(debate_prompt)
+        logger.info(f"Total processing time: {time.time() - start_time:.2f}s")
         return transcription, ai_response
     return None, None
-
 
 if __name__ == "__main__":
     # Example usage

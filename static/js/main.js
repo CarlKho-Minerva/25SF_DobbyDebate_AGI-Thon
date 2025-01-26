@@ -64,32 +64,34 @@ document.addEventListener("DOMContentLoaded", () => {
     dobbyWrapper.classList.toggle("speaking", speaking);
   }
 
-  button.addEventListener("click", () => {
-    if (!isRecording) {
-      button.disabled = true;
-      updateUserStatus(true);
-      socket.emit("start_recording");
+  button.addEventListener("mousedown", () => {
+    if (!isRecording && !button.disabled) {
+      isRecording = true;
+      button.disabled = true;  // Prevent multiple triggers
+      userStatus.textContent = '🎙️ Recording...';
+      button.classList.add('recording');
+      socket.emit('start_recording');
+    }
+  });
+
+  button.addEventListener("mouseup", () => {
+    if (isRecording) {
+      isRecording = false;
+      userStatus.textContent = '🎙️ Ready';
+      button.classList.remove('recording');
+      // Button stays disabled until Dobby responds
     }
   });
 
   socket.on("recording_started", (data) => {
-    updateUserStatus(true);
-    timer.style.display = "block";
+    timer.textContent = '5s';
   });
 
   socket.on("timer_update", (data) => {
-    const timer = document.getElementById("recordingTimer");
-    if (data.seconds > 0) {
-        timer.textContent = data.seconds;
-        timer.style.display = "block";
-    } else {
-        timer.style.display = "none";
-        updateUserStatus(false);
-    }
+    timer.textContent = data.seconds > 0 ? `${data.seconds}s` : '';
   });
 
   socket.on("dobby_response", (data) => {
-    button.disabled = true;
     updateUserStatus(false);
     timer.textContent = "";
     userTranscript.textContent = `You: ${data.user_said}`;
@@ -99,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setTimeout(() => {
         updateDobbyStatus(false);
-        button.disabled = false;
+        button.disabled = false;  // Re-enable button after Dobby responds
         dobbyResponse.classList.remove('speaking');
     }, 5000);
   });
@@ -114,6 +116,10 @@ document.addEventListener("DOMContentLoaded", () => {
     console.error("Server error:", data.message);
     button.disabled = false;
     updateUserStatus(false);
+    userStatus.textContent = '❌ Error';
+    setTimeout(() => {
+        userStatus.textContent = '🎙️ Ready';
+    }, 2000);
   });
 
   // Initialize with disabled speak button
