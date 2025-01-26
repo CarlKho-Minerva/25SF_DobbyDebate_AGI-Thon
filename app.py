@@ -4,7 +4,6 @@ import logging
 from services.audio_service import AudioService
 from services.chat_service import ChatService
 from services.transcription_service import TranscriptionService
-from config import AudioConfig, ChatConfig, TranscriptionConfig
 import time
 import os
 from functools import wraps
@@ -16,9 +15,9 @@ socketio = SocketIO(
 logger = logging.getLogger(__name__)
 
 # Initialize services
-audio_service = AudioService(AudioConfig())
-chat_service = ChatService(ChatConfig())
-transcription_service = TranscriptionService(TranscriptionConfig())
+audio_service = AudioService()
+chat_service = ChatService()
+transcription_service = TranscriptionService()
 
 
 @app.route("/")

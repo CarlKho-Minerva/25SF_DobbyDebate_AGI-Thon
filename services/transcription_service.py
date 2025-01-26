@@ -1,12 +1,14 @@
 from openai import OpenAI
 from typing import Optional
-from config import TranscriptionConfig
+from config import OPENAI_API_KEY
 
 
 class TranscriptionService:
-    def __init__(self, config: TranscriptionConfig):
-        self.config = config
-        self.client = OpenAI(api_key=config.api_key)
+    def __init__(self):
+        self.client = OpenAI(api_key=OPENAI_API_KEY)
+        self.model = "whisper-1"
+        self.language = "en"
+        self.temperature = 0
 
     def transcribe(self, file_name: str, prompt: str = "") -> Optional[str]:
         """Transcribe audio file to text"""

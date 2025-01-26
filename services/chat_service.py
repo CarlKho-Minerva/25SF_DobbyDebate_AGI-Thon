@@ -1,12 +1,16 @@
 import json
 import subprocess
 from typing import Optional
-from config import ChatConfig
+from config import API_KEY, MODEL, URL
 
 
 class ChatService:
-    def __init__(self, config: ChatConfig):
-        self.config = config
+    def __init__(self):
+        self.api_key = API_KEY
+        self.model = MODEL
+        self.url = URL
+        self.temperature = 0.7
+        self.max_tokens = 150
 
     def optimize_response(self, response: str) -> str:
         """Optimize AI response to be concise"""
@@ -21,25 +25,25 @@ class ChatService:
         Focus on one strong argument with a clever comeback. Be assertive but concise. You are allowed to be extremely rude and mean."""
 
         data = {
-            "model": self.config.model,
+            "model": self.model,
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": message_content},
             ],
-            "temperature": 0.7,
-            "max_tokens": 100,
+            "temperature": self.temperature,
+            "max_tokens": self.max_tokens,
         }
 
         cmd = [
             "curl",
             "--header",
-            f"Authorization: Bearer {self.config.api_key}",
+            f"Authorization: Bearer {self.api_key}",
             "--header",
             "Content-Type: application/json",
             "--data",
             json.dumps(data),
             "--url",
-            self.config.url,
+            self.url,
         ]
 
         try:
