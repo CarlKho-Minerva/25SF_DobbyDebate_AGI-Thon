@@ -35,9 +35,25 @@ body {
 .participant-container {
     background: var(--secondary-bg);
     border-radius: 8px;
-    padding: 2rem;
+    padding: 1.5rem;
     text-align: center;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 400px;
+}
+
+.participant-container:first-child {
+    background: var(--secondary-bg);
+}
+
+.participant-container:last-child {
+    background: var(--secondary-bg);
+}
+
+.avatar-wrapper, .avatar, .participant-name {
+    display: none;
 }
 
 .avatar-wrapper {
@@ -59,12 +75,14 @@ body {
 
 .status-indicator {
     position: absolute;
-    bottom: 5px;
-    right: 5px;
-    width: 16px;
-    height: 16px;
+    bottom: 10px;
+    right: 10px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
-    border: 3px solid var(--secondary-bg);
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 10;
 }
 
 .status-indicator.online {
@@ -131,10 +149,15 @@ body {
 }
 
 .timer {
-    font-size: 2rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 4rem;
     font-weight: bold;
-    color: var(--accent);
-    margin-top: 1rem;
+    color: white;
+    text-shadow: 0 0 10px rgba(0,0,0,0.5);
+    z-index: 10;
     display: none;
 }
 
@@ -181,4 +204,82 @@ body {
         opacity: 1;
         transform: scale(1);
     }
+}
+
+.dobby-wrapper {
+    position: relative;
+    width: 260px;
+    height: 260px;
+    margin: 0 auto 1rem;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    padding: 20px;
+}
+
+.dobby-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transform: scaleX(-1);
+}
+
+/* Hide old avatar styles for Dobby */
+.avatar-wrapper, .avatar.dobby {
+    display: none;
+}
+
+/* Update status indicator position for Dobby */
+.dobby-wrapper .status-indicator {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    z-index: 10;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Add bounce animation for speaking state */
+@keyframes bounce {
+    0%, 100% { transform: translateY(0) scaleX(-1); }
+    50% { transform: translateY(-10px) scaleX(-1); }
+}
+
+.dobby-wrapper.speaking .dobby-image {
+    animation: bounce 1s ease-in-out infinite;
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    background: var(--secondary-bg);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+#userVideo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+    border-radius: 8px;
+}
+
+.user-wrapper {
+    position: relative;
+    width: 260px;
+    height: 260px;
+    margin: 0 auto 1rem;
+    background: var(--secondary-bg);
+    border-radius: 16px;
+    overflow: hidden;
+    padding: 20px;
+}
+
+.user-wrapper.speaking {
+    box-shadow: 0 0 20px var(--status-online);
 }

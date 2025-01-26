@@ -17,21 +17,15 @@ document.addEventListener("DOMContentLoaded", () => {
     isRecording = speaking;
     userStatus.textContent = speaking ? "🎙️ Speaking..." : "🎙️ Ready";
     userStatus.classList.toggle("speaking", speaking);
-    const indicator = document
-      .querySelector(".user")
-      .parentElement.querySelector(".status-indicator");
-    indicator.classList.toggle("speaking", speaking);
-    indicator.style.borderColor = speaking ? "#f04747" : "var(--secondary-bg)";
+    const userWrapper = document.querySelector(".user-wrapper");
+    userWrapper.classList.toggle("speaking", speaking);
   }
 
   function updateDobbyStatus(speaking) {
     dobbyStatus.textContent = speaking ? "🔊 Speaking..." : "🔊 Ready";
     dobbyStatus.classList.toggle("speaking", speaking);
-    const indicator = document
-      .querySelector(".dobby")
-      .parentElement.querySelector(".status-indicator");
-    indicator.classList.toggle("speaking", speaking);
-    indicator.style.borderColor = speaking ? "#3ba55c" : "var(--secondary-bg)";
+    const dobbyWrapper = document.querySelector(".dobby-wrapper");
+    dobbyWrapper.classList.toggle("speaking", speaking);
   }
 
   button.addEventListener("click", () => {
@@ -48,9 +42,13 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   socket.on("timer_update", (data) => {
-    timer.textContent = data.seconds || "";
-    if (data.seconds === 0) {
-      updateUserStatus(false);
+    const timer = document.getElementById("recordingTimer");
+    if (data.seconds > 0) {
+        timer.textContent = data.seconds;
+        timer.style.display = "block";
+    } else {
+        timer.style.display = "none";
+        updateUserStatus(false);
     }
   });
 
