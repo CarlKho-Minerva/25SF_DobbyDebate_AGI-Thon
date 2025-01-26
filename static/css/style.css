@@ -99,6 +99,10 @@ body {
     font-size: 0.875rem;
     font-weight: 500;
     transition: all 0.2s;
+    cursor: pointer;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
 }
 
 .topic-button:hover {
@@ -165,8 +169,8 @@ body {
     position: absolute;
     bottom: 10px;
     right: 10px;
-    width: 12px;
-    height: 12px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     border: 2px solid var(--background);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -194,9 +198,11 @@ body {
 }
 
 .participant-name {
+    display: block;
+    font-weight: 700;
     font-size: 1.2rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
+    margin: 0.5rem 0;
+    color: var(--text-primary);
 }
 
 .mic-status {
@@ -221,6 +227,9 @@ body {
     min-width: 200px;
     animation: button-pulse 2s infinite;
     width: 100%;
+    cursor: pointer;
+    max-width: 100%;
+    margin: 0;
 }
 
 .debate-button:hover {
@@ -374,6 +383,7 @@ body {
     object-fit: cover;
     transform: scaleX(-1);
     border-radius: 8px;
+    display: none; /* Initially hidden until camera is active */
 }
 
 .user-wrapper {
@@ -391,6 +401,13 @@ body {
 
 .user-wrapper.speaking {
     box-shadow: 0 0 20px var(--status-online);
+}
+
+.user-image.fallback {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .debate-header, .debate-prompt-container, .prompt-categories {
@@ -664,6 +681,8 @@ body {
     margin: 2rem auto 0;
     padding: 0 1rem;
     min-height: calc(100vh - 8rem);
+    min-height: calc(100vh - 4rem);
+    margin-bottom: 2rem;
 }
 
 .debate-section {
@@ -686,6 +705,8 @@ body {
     flex-direction: column;
     gap: 1.5rem;
     height: 100%;
+    gap: 2rem;
+    padding-bottom: 2rem;
 }
 
 .speak-control {
@@ -701,6 +722,8 @@ body {
     border: 1px solid var(--border);
     border-radius: 0.75rem;
     padding: 1.25rem;
+    margin: 0;
+    margin-bottom: 1rem;
 }
 
 .debate-topic {
@@ -752,4 +775,222 @@ body {
     }
 }
 
+button {
+    cursor: pointer;
+}
+
+.instructions-section {
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    margin: 0;
+    margin-bottom: 1rem;
+}
+
+.instructions-section ol {
+    margin: 0;
+    padding-left: 25px;
+    color: #fff;
+    line-height: 1.6;
+}
+
+.instructions-section li {
+    margin: 8px 0;
+}
+
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.overlay.active {
+    display: flex;
+}
+
+.timer-display {
+    font-size: 8rem;
+    color: white;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    animation: pulse 1s infinite;
+}
+
 /* ...rest of existing styles... */
+
+.future-plans-button {
+    margin-top: 20px;
+    background: var(--accent-blue);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 20px auto 0;
+    transition: transform 0.2s;
+}
+
+.future-plans-button:hover {
+    transform: translateY(-2px);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.close-modal {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--text-secondary);
+}
+
+.modal-body {
+    margin-top: 20px;
+}
+
+.modal h2, .modal h3, .modal p, .modal li {
+    color: var(--text-primary);
+}
+
+.modal h2 {
+    margin: 0;
+}
+
+.modal h3 {
+    margin: 24px 0 16px;
+}
+
+.modal ol {
+    margin: 16px 0;
+    padding-left: 24px;
+}
+
+.modal li {
+    margin: 12px 0;
+}
+
+.example-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 24px 0;
+}
+
+.development-note {
+    border-top: 1px solid var(--border);
+    margin-top: 24px;
+    padding-top: 16px;
+    font-style: italic;
+    color: var(--text-secondary);
+}
+
+.future-plans-section {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.future-plans-button.subtle {
+    background: var(--background);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    opacity: 0.7;
+}
+
+.future-plans-button.subtle:hover {
+    opacity: 1;
+    background: var(--secondary);
+    transform: none;
+}
+
+.site-footer {
+    display: none;
+}
+
+.countdown-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.countdown-message {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    line-height: 1.4;
+    color: white;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.minimal-footer {
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.minimal-footer a {
+    color: var(--text-secondary);
+    text-decoration: none;
+}
+
+.minimal-footer a:hover {
+    text-decoration: underline;
+}
+
+.camera-permission {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    z-index: 20;
+    display: none;
+}
+
+.camera-permission.visible {
+    display: block;
+}

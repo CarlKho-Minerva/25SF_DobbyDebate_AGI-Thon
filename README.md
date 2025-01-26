@@ -2,6 +2,15 @@
 
 *"Making Roasts Great Again!"*
 
+<div>
+    <a href="https://www.loom.com/share/23080c25ee2b4269a63eea76fe54bc07">
+      <p>Dobby Debates | AGI-thon Entry by Carl Kho - Watch Video</p>
+    </a>
+    <a href="https://www.loom.com/share/23080c25ee2b4269a63eea76fe54bc07">
+      <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/23080c25ee2b4269a63eea76fe54bc07-6b26ffc81ea5b037-full-play.gif">
+    </a>
+  </div>
+
 ## About
 
 Welcome to the most unconventional presidential debate simulator where you face off against Dobby, the most savage AI debater in the game. Think CNN debates meet Comedy Central Roasts, but with AI that doesn't hold back.

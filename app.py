@@ -1,17 +1,24 @@
-from flask import Flask, render_template, jsonify, request
-from flask_socketio import SocketIO, emit
-from Dobby_Class import process_audio_and_chat
-from dobby_voice import text_to_speech, play
-import threading
+from flask import Flask, render_template, request, has_request_context
+from flask_socketio import SocketIO
+import logging
+from services.audio_service import AudioService
+from services.chat_service import ChatService
+from services.transcription_service import TranscriptionService
+from config import AudioConfig, ChatConfig, TranscriptionConfig
 import time
+import os
+from functools import wraps
 
-# Initialize Flask
 app = Flask(__name__)
-
-# Configure SocketIO with threading mode
 socketio = SocketIO(
     app, cors_allowed_origins="*", async_mode="threading", ping_timeout=60
 )
+logger = logging.getLogger(__name__)
+
+# Initialize services
+audio_service = AudioService(AudioConfig())
+chat_service = ChatService(ChatConfig())
+transcription_service = TranscriptionService(TranscriptionConfig())
 
 
 @app.route("/")
@@ -19,51 +26,70 @@ def index():
     return render_template("index.html")
 
 
+def ensure_request_context(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if not has_request_context():
+            with app.request_context():
+                return f(*args, **kwargs)
+        return f(*args, **kwargs)
+    return wrapper
+
 @socketio.on("start_recording")
+@ensure_request_context
 def handle_recording():
+    """Handle recording with improved error handling"""
+    temp_file = None
     try:
-        current_topic = request.args.get('topic', 'Debate this topic')
-        socketio.emit("recording_started", {"status": "started"})
+        current_topic = request.args.get("topic", "Debate this topic")
+        logger.info(f"Starting recording for topic: {current_topic}")
+        socketio.emit("recording_started")
 
-        # Start timer in background thread
-        def timer_thread():
-            for i in range(5, 0, -1):
-                socketio.emit("timer_update", {"seconds": i})
-                time.sleep(1)
-            socketio.emit("timer_update", {"seconds": 0})
+        # Record audio
+        temp_file = audio_service.record_audio(timed_recording=True, record_seconds=5)
+        if not temp_file or not os.path.exists(temp_file):
+            raise Exception("Audio recording failed or file not found")
 
-        timer = threading.Thread(target=timer_thread)
-        timer.daemon = True
-        timer.start()
+        # Transcribe audio
+        transcription = transcription_service.transcribe(
+            temp_file,
+            prompt=f"Debate this topic briefly: {current_topic}"
+        )
+        if not transcription:
+            raise Exception("No transcription received")
+        logger.info(f"Transcription received: {transcription[:50]}...")
 
-        # Process audio in main thread
-        transcription, ai_response = process_audio_and_chat(
-            prompt=f"Debate this topic: {current_topic}",
-            timed_recording=True,
-            record_seconds=5,
-            is_english=True,
+        # Get AI response
+        ai_response = chat_service.send_message(
+            f"Respond to this point briefly: {transcription}"
+        )
+        if not ai_response:
+            raise Exception("No AI response received")
+        logger.info(f"AI response received: {ai_response[:50]}...")
+
+        # Emit response
+        socketio.emit(
+            "dobby_response",
+            {
+                "text": ai_response,
+                "user_said": transcription,
+                "timestamp": time.time()
+            }
         )
 
-        if transcription and ai_response:
-            # Convert AI response to speech
-            audio = text_to_speech(ai_response)
-            if audio:
-                socketio.emit(
-                    "dobby_response", {"text": ai_response, "user_said": transcription}
-                )
-                # Play audio in background
-                player = threading.Thread(target=play, args=(audio,))
-                player.daemon = True
-                player.start()
-
     except Exception as e:
-        print(f"Error in handle_recording: {e}")
-        socketio.emit("error", {"message": str(e)})
+        error_msg = str(e)
+        logger.error(f"Recording failed: {error_msg}")
+        socketio.emit("error", {"message": f"Recording failed: {error_msg}"})
+
+    finally:
+        # Cleanup temp file
+        if temp_file and os.path.exists(temp_file):
+            try:
+                os.remove(temp_file)
+            except Exception as e:
+                logger.error(f"Failed to remove temp file: {str(e)}")
 
 
 if __name__ == "__main__":
-    try:
-        print("Starting server...")
-        socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
-    except Exception as e:
-        print(f"Server error: {e}")
+    socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
