@@ -113,6 +113,15 @@ document.addEventListener("DOMContentLoaded", () => {
     dobbyResponse.classList.add('speaking');
     updateDobbyStatus(true);
 
+    // Play audio response if available
+    if (data.audio) {
+        const audioData = new Uint8Array(data.audio.split('').map(c => c.charCodeAt(0)));
+        const blob = new Blob([audioData], { type: 'audio/mpeg' });
+        const audioUrl = URL.createObjectURL(blob);
+        const audio = new Audio(audioUrl);
+        audio.play();
+    }
+
     setTimeout(() => {
         updateDobbyStatus(false);
         button.disabled = false;  // Re-enable button after Dobby responds

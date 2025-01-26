@@ -76,12 +76,18 @@ def handle_recording():
             raise Exception("No AI response received")
         logger.info(f"AI response received: {ai_response[:50]}...")
 
-        # Emit response
+        # Convert to speech
+        audio_bytes = audio_service.text_to_speech(ai_response)
+        if not audio_bytes:
+            raise Exception("Failed to convert response to speech")
+
+        # Emit response with audio
         socketio.emit(
             "dobby_response",
             {
                 "text": ai_response,
                 "user_said": transcription,
+                "audio": audio_bytes.decode('latin1'),  # Convert bytes to string for transport
                 "timestamp": time.time()
             }
         )
