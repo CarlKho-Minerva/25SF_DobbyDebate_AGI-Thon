@@ -43,6 +43,10 @@ def text_to_speech(
             voice_id=voice_id,
             model_id=model_id,
             output_format="mp3_44100_128",
+            voice_settings={
+                "stability": 0.5,  # Lower stability for more expressiveness
+                "similarity_boost": 0.75,  # Keep voice consistent but expressive
+            },
         )
         return audio
     except Exception as e:

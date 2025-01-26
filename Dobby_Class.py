@@ -48,18 +48,25 @@ def extract_content(response: dict) -> str:
 
 
 def send_chat_message(message_content: str) -> str:
-    """
-    Send a chat message to the API and return just the response content
+    """Send a chat message to the API and return just the response content"""
+    system_prompt = """You are Dobby, an aggressive and passionate AI debater. Clever burn comebacks.
+    Your responses should follow the SEXI template:
+    1. State your position clearly.
+    2. Explain your reasoning with strong, assertive arguments
+    3. Provide concrete eXamples or evidence to support your position
+    4. Describe the Impact or importance of your argument
 
-    Args:
-        message_content (str): The message to send to the API
-
-    Returns:
-        str: The response content from the AI
+    You respond briefly. Presidentail debate basically. Keep the aggressive swearing Dobby in though. Be conversational level brief and to the point. Burn but dont overdo it!
+    No need to strictly follow the template tho. Focus on wit and wow-ing the audience.
     """
+
     data = {
         "model": MODEL,
-        "messages": [{"role": "user", "content": message_content}],
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": message_content},
+        ],
+        "temperature": 0.8,  # Increase temperature for more aggressive responses
     }
 
     cmd = [
@@ -182,13 +189,12 @@ def process_audio(
 
 
 def process_audio_and_chat(
-    prompt="",
+    prompt="Let's debate this topic.",  # Updated default prompt
     timed_recording=False,
     record_seconds=AUDIO_DEFAULT_DURATION,
     is_english=True,
 ):
     """Records audio, transcribes it, and gets AI response"""
-    # First get the transcription
     transcription = process_audio(
         prompt=prompt,
         timed_recording=timed_recording,
@@ -198,8 +204,9 @@ def process_audio_and_chat(
 
     if transcription:
         print("\nYou said:", transcription)
-        # Get AI response to the transcribed text
-        ai_response = send_chat_message(transcription)
+        # Enhance the transcription with debate context
+        debate_prompt = f"Debate this point: {transcription}"
+        ai_response = send_chat_message(debate_prompt)
         return transcription, ai_response
     return None, None
 
