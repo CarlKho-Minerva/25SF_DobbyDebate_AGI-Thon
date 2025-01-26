@@ -13,6 +13,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let isRecording = false;
 
+  const debateTopics = [
+    "Web3 is the future of the internet",
+    "AI will replace all developers by 2030",
+    "Remote work is killing innovation",
+    "Bitcoin is digital gold",
+    "DeFi will replace traditional banking",
+    "NFTs are a scam",
+    "Social media is destroying society",
+    "Universities are obsolete",
+    "The Metaverse will fail",
+    "Apple is just a marketing company now"
+  ];
+
+  function getRandomTopic() {
+    return debateTopics[Math.floor(Math.random() * debateTopics.length)];
+  }
+
+  const randomTopicBtn = document.getElementById('randomTopic');
+  const startDebateBtn = document.getElementById('startDebate');
+  const currentTopicEl = document.getElementById('currentTopic');
+
+  function updateTopic() {
+    const newTopic = getRandomTopic();
+    currentTopicEl.textContent = newTopic;
+    startDebateBtn.disabled = false;
+    return newTopic;
+  }
+
+  randomTopicBtn.addEventListener('click', () => {
+    const topic = updateTopic();
+    console.log('New topic:', topic);
+  });
+
+  // Initial random topic
+  updateTopic();
+
   function updateUserStatus(speaking) {
     isRecording = speaking;
     userStatus.textContent = speaking ? "🎙️ Speaking..." : "🎙️ Ready";
@@ -53,16 +89,16 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   socket.on("dobby_response", (data) => {
-    button.disabled = false;
+    button.disabled = true;  // Keep disabled while Dobby speaks
     updateUserStatus(false);
     timer.textContent = "";
     userTranscript.textContent = `You said: ${data.user_said}`;
     dobbyResponse.textContent = data.text;
     updateDobbyStatus(true);
 
-    // Reset Dobby's status after speech ends
     setTimeout(() => {
-      updateDobbyStatus(false);
+        updateDobbyStatus(false);
+        button.disabled = false;  // Re-enable after Dobby finishes
     }, 5000);
   });
 
@@ -77,4 +113,9 @@ document.addEventListener("DOMContentLoaded", () => {
     button.disabled = false;
     updateUserStatus(false);
   });
+
+  // Initialize with disabled speak button
+  document.getElementById('startDebate').disabled = true;
+
+  document.getElementById('randomTopic').addEventListener('click', updateTopic);
 });

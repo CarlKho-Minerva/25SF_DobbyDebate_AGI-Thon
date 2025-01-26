@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 from flask_socketio import SocketIO, emit
 from Dobby_Class import process_audio_and_chat
 from dobby_voice import text_to_speech, play
@@ -22,7 +22,7 @@ def index():
 @socketio.on("start_recording")
 def handle_recording():
     try:
-        # Emit recording start
+        current_topic = request.args.get('topic', 'Debate this topic')
         socketio.emit("recording_started", {"status": "started"})
 
         # Start timer in background thread
@@ -38,7 +38,7 @@ def handle_recording():
 
         # Process audio in main thread
         transcription, ai_response = process_audio_and_chat(
-            prompt="Conversation with user",
+            prompt=f"Debate this topic: {current_topic}",
             timed_recording=True,
             record_seconds=5,
             is_english=True,
