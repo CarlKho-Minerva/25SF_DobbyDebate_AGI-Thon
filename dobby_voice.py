@@ -29,8 +29,8 @@ def list_available_voices(client: ElevenLabs):
 
 def text_to_speech(
     text: str,
-    voice_id: str = "JBFqnCBsd6RMkjVDRZzb",  # Josh voice
-    model_id: str = "eleven_multilingual_v2",
+    voice_id: str = "lE5ZJB6jGeeuvSNxOvs2",  # Marshal (annoying) voice
+    model_id: str = "eleven_turbo_v2_5",
 ) -> Optional[bytes]:
     """Convert text to speech using ElevenLabs"""
     client = init_eleven_labs()
