@@ -9,64 +9,69 @@
 </head>
 
 <body>
-    <header class="main-header">
-        <div class="header-content">
-            <h1>🎭 Dobby Debates</h1>
-        </div>
-    </header>
+    <div class="logo">
+        <h1>🎭 Dobby Debates</h1>
+    </div>
 
-    <div class="app-container">
-
-        <div class="debate-grid">
-            <!-- User container -->
-            <div class="participant-container">
-                <div class="user-wrapper">
-                    <img src="https://pbs.twimg.com/media/Ej9HDDQX0Ac1Hjw.png" alt="User" class="user-image">
-                    <div class="status-indicator online"></div>
+    <div class="main-grid">
+        <!-- Left Column: Debate Arena -->
+        <div class="debate-section">
+            <div class="debate-grid">
+                <!-- User container -->
+                <div class="participant-container">
+                    <div class="user-wrapper">
+                        <img src="https://pbs.twimg.com/media/Ej9HDDQX0Ac1Hjw.png" alt="User" class="user-image">
+                        <div class="status-indicator online"></div>
+                    </div>
+                    <div class="mic-status" id="userStatus">🎙️ Ready</div>
+                    <div class="timer" id="recordingTimer"></div>
                 </div>
-                <div class="mic-status" id="userStatus">🎙️ Ready</div>
-                <div class="timer" id="recordingTimer"></div>
-            </div>
 
-            <!-- Dobby container -->
-            <div class="participant-container">
-                <div class="dobby-wrapper">
-                    <img src="{{ url_for('static', filename='images/dobby.png') }}" alt="Dobby" class="dobby-image">
-                    <div class="status-indicator active"></div>
+                <!-- Dobby container -->
+                <div class="participant-container">
+                    <div class="dobby-wrapper">
+                        <img src="{{ url_for('static', filename='images/dobby.png') }}" alt="Dobby" class="dobby-image">
+                        <div class="status-indicator active"></div>
+                    </div>
+                    <div class="mic-status" id="dobbyStatus">🔊 Ready</div>
+                    <div class="response-text" id="dobbyResponse"></div>
                 </div>
-                <div class="mic-status" id="dobbyStatus">🔊 Ready</div>
-                <div class="response-text" id="dobbyResponse"></div>
             </div>
-        </div>
-
-        <div class="debate-topic-section">
-            <span class="topic-label">Current Topic</span>
-            <h2 id="currentTopic" class="debate-topic">Select a topic to begin</h2>
-            <button id="randomTopic" class="topic-button">
-                <span class="button-icon">🎲</span>
-                Generate Topic
-            </button>
-        </div>
-
-        <div class="controls">
-            <button id="startDebate" class="debate-button" disabled>
-                <span class="button-icon">🎙️</span>
-                <span class="button-text">Press to Speak</span>
-            </button>
             <div class="transcript" id="userTranscript"></div>
         </div>
 
-        <div class="debate-footer">
-            <div class="betting-system">
-                <h3>💰 Win ETH by Winning Debates</h3>
-                <div class="steps-container">
-                    <div class="step">1. Pay 0.01Ξ to debate</div>
-                    <div class="step">2. 1min debate → Twitter</div>
-                    <div class="step">3. 24h community vote</div>
-                    <div class="step">4. Winner takes 0.02Ξ</div>
+        <!-- Right Column: Controls -->
+        <div class="control-section">
+            <div class="control-wrapper">
+                <div class="debate-topic-section">
+                    <span class="topic-label">TOPIC</span>
+                    <h2 id="currentTopic" class="debate-topic">Select a topic to begin</h2>
+                    <button id="randomTopic" class="topic-button">
+                        <span class="button-icon">🎲</span>
+                        New Topic
+                    </button>
                 </div>
-                <a href="#" class="twitter-link">@DobbyDebates</a>
+
+                <div class="speak-control">
+                    <button id="startDebate" class="debate-button" disabled>
+                        <span class="button-icon">🎙️</span>
+                        Press to Speak
+                    </button>
+                </div>
             </div>
+        </div>
+    </div>
+
+    <div class="debate-footer">
+        <div class="betting-system">
+            <h3>💰 Win ETH by Winning Debates</h3>
+            <div class="steps-container">
+                <div class="step">1. Pay 0.01Ξ to debate</div>
+                <div class="step">2. 1min debate → Twitter</div>
+                <div class="step">3. 24h community vote</div>
+                <div class="step">4. Winner takes 0.02Ξ</div>
+            </div>
+            <a href="#" class="twitter-link">@DobbyDebates</a>
         </div>
     </div>
 

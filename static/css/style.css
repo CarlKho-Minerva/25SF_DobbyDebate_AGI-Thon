@@ -58,16 +58,15 @@ body {
 }
 
 .app-container {
-    max-width: 1100px;
-    margin: 2rem auto;
-    padding: 1rem;
+    max-width: 1400px;
+    padding: 4rem 1rem 2rem;
 }
 
 .topic-container {
-    background: var(--usa-white);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 1.5rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
     margin-bottom: 2rem;
     text-align: center;
 }
@@ -109,7 +108,8 @@ body {
 .debate-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
+    gap: 1.5rem;
+    height: 100%;
     margin-bottom: 2rem;
 }
 
@@ -123,7 +123,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 400px;
+    min-height: 300px;
 }
 
 .participant-container:first-child {
@@ -214,6 +214,7 @@ body {
     margin: 0 auto;
     min-width: 200px;
     animation: button-pulse 2s infinite;
+    width: 100%;
 }
 
 .debate-button:hover {
@@ -284,6 +285,8 @@ body {
     border: 1px solid var(--border);
     border-radius: 0.5rem;
     margin-top: 1rem;
+    max-height: 200px;
+    overflow-y: auto;
 }
 
 @keyframes pulse {
@@ -621,4 +624,66 @@ body {
 
 .debate-button:not(:disabled) {
     animation: button-pulse 2s infinite;
+}
+
+.logo {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 100;
+    background: var(--card);
+    padding: 0.75rem 1.25rem;
+    border-radius: 9999px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.logo h1 {
+    font-size: 1.25rem;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.main-grid {
+    display: grid;
+    grid-template-columns: 75fr 25fr;
+    gap: 1.5rem;
+    min-height: calc(100vh - 8rem);
+    max-width: 1400px;
+    margin: 4rem auto 0;
+    padding: 0 1rem;
+}
+
+.debate-section {
+    padding-right: 1.5rem;
+    border-right: 1px solid var(--border);
+}
+
+.control-section {
+    position: sticky;
+    top: 1rem;
+}
+
+.control-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.speak-control {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.debate-topic-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+}
+
+.debate-topic {
+    font-size: 1.125rem;
+    line-height: 1.5;
+    margin: 0.75rem 0;
 }
