@@ -75,6 +75,11 @@ body {
     background-color: var(--status-active);
 }
 
+.status-indicator.speaking {
+    background-color: #f04747;
+    animation: pulse 1s infinite;
+}
+
 .participant-name {
     font-size: 1.2rem;
     font-weight: 600;
@@ -115,4 +120,47 @@ body {
 
 .button-icon {
     font-size: 1.4rem;
+}
+
+.timer {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--accent);
+    margin-top: 1rem;
+}
+
+.response-text {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    max-height: 100px;
+    overflow-y: auto;
+}
+
+.speaking {
+    animation: pulse 1s infinite;
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.transcript {
+    width: 100%;
+    max-width: 600px;
+    padding: 1rem;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
 }

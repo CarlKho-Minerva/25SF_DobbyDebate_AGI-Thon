@@ -1,34 +1,51 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const button = document.getElementById('startDebate');
+document.addEventListener("DOMContentLoaded", () => {
+  const socket = io();
+  const button = document.getElementById("startDebate");
+  const userStatus = document.getElementById("userStatus");
+  const dobbyStatus = document.getElementById("dobbyStatus");
+  const timer = document.getElementById("recordingTimer");
+  const userTranscript = document.getElementById("userTranscript");
+  const dobbyResponse = document.getElementById("dobbyResponse");
 
-    button.addEventListener('click', async () => {
-        button.disabled = true;
-        button.innerHTML = '<span class="button-icon">⏳</span> Starting...';
+  function updateUserStatus(speaking) {
+    userStatus.textContent = speaking ? "🎙️ Speaking..." : "🎙️ Ready";
+    userStatus.classList.toggle("speaking", speaking);
+    document
+      .querySelector(".user")
+      .parentElement.querySelector(".status-indicator")
+      .classList.toggle("speaking", speaking);
+  }
 
-        try {
-            const response = await fetch('/api/start_debate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
+  function updateDobbyStatus(speaking) {
+    dobbyStatus.textContent = speaking ? "🔊 Speaking..." : "🔊 Ready";
+    dobbyStatus.classList.toggle("speaking", speaking);
+    document
+      .querySelector(".dobby")
+      .parentElement.querySelector(".status-indicator")
+      .classList.toggle("speaking", speaking);
+  }
 
-            const data = await response.json();
+  button.addEventListener("click", () => {
+    button.disabled = true;
+    updateUserStatus(true);
+    socket.emit("start_recording");
+  });
 
-            if (data.status === 'success') {
-                button.innerHTML = '<span class="button-icon">🎤</span> Debate Started!';
-                // Future: Initialize WebSocket connection here
-            } else {
-                throw new Error(data.message || 'Failed to start debate');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            button.innerHTML = '<span class="button-icon">❌</span> Error - Try Again';
-        } finally {
-            setTimeout(() => {
-                button.disabled = false;
-                button.innerHTML = '<span class="button-icon">🎯</span> Start Debate!';
-            }, 3000);
-        }
-    });
+  socket.on("timer_update", (data) => {
+    timer.textContent = data.seconds;
+  });
+
+  socket.on("dobby_response", (data) => {
+    button.disabled = false;
+    updateUserStatus(false);
+    timer.textContent = "";
+    userTranscript.textContent = `You said: ${data.user_said}`;
+    dobbyResponse.textContent = data.text;
+    updateDobbyStatus(true);
+
+    // Reset Dobby's status after speech ends (approximate duration)
+    setTimeout(() => {
+      updateDobbyStatus(false);
+    }, 5000); // Adjust based on typical response length
+  });
 });

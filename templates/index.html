@@ -20,7 +20,8 @@
                     <div class="status-indicator online"></div>
                 </div>
                 <div class="participant-name">You</div>
-                <div class="mic-status">🎙️ Ready</div>
+                <div class="mic-status" id="userStatus">🎙️ Ready</div>
+                <div class="timer" id="recordingTimer"></div>
             </div>
 
             <!-- Dobby container -->
@@ -34,15 +35,20 @@
                     <div class="status-indicator active"></div>
                 </div>
                 <div class="participant-name">Dobby</div>
-                <div class="mic-status">🔊 Active</div>
+                <div class="mic-status" id="dobbyStatus">🔊 Ready</div>
+                <div class="response-text" id="dobbyResponse"></div>
             </div>
         </div>
 
-        <button id="startDebate" class="debate-button">
-            <span class="button-icon">🎯</span>
-            Start Debate!
-        </button>
+        <div class="controls">
+            <button id="startDebate" class="debate-button">
+                <span class="button-icon">🎙️</span>
+                Press to Speak
+            </button>
+            <div class="transcript" id="userTranscript"></div>
+        </div>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
