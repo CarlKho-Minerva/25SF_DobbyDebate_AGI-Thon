@@ -89,16 +89,18 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   socket.on("dobby_response", (data) => {
-    button.disabled = true;  // Keep disabled while Dobby speaks
+    button.disabled = true;
     updateUserStatus(false);
     timer.textContent = "";
-    userTranscript.textContent = `You said: ${data.user_said}`;
-    dobbyResponse.textContent = data.text;
+    userTranscript.textContent = `You: ${data.user_said}`;
+    dobbyResponse.textContent = `Dobby: ${data.text}`;
+    dobbyResponse.classList.add('speaking');
     updateDobbyStatus(true);
 
     setTimeout(() => {
         updateDobbyStatus(false);
-        button.disabled = false;  // Re-enable after Dobby finishes
+        button.disabled = false;
+        dobbyResponse.classList.remove('speaking');
     }, 5000);
   });
 

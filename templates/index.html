@@ -25,6 +25,7 @@
                     </div>
                     <div class="mic-status" id="userStatus">🎙️ Ready</div>
                     <div class="timer" id="recordingTimer"></div>
+                    <div class="transcript user-transcript" id="userTranscript"></div>
                 </div>
 
                 <!-- Dobby container -->
@@ -34,13 +35,12 @@
                         <div class="status-indicator active"></div>
                     </div>
                     <div class="mic-status" id="dobbyStatus">🔊 Ready</div>
-                    <div class="response-text" id="dobbyResponse"></div>
+                    <div class="transcript dobby-transcript" id="dobbyResponse"></div>
                 </div>
             </div>
-            <div class="transcript" id="userTranscript"></div>
         </div>
 
-        <!-- Right Column: Controls -->
+        <!-- Right Column: Controls Only -->
         <div class="control-section">
             <div class="control-wrapper">
                 <div class="debate-topic-section">
@@ -51,7 +51,6 @@
                         New Topic
                     </button>
                 </div>
-
                 <div class="speak-control">
                     <button id="startDebate" class="debate-button" disabled>
                         <span class="button-icon">🎙️</span>
@@ -66,10 +65,10 @@
         <div class="betting-system">
             <h3>💰 Win ETH by Winning Debates</h3>
             <div class="steps-container">
-                <div class="step">1. Pay 0.01Ξ to debate</div>
+                <div class="step">1. Pay 0.01 ETH to debate</div>
                 <div class="step">2. 1min debate → Twitter</div>
                 <div class="step">3. 24h community vote</div>
-                <div class="step">4. Winner takes 0.02Ξ</div>
+                <div class="step">4. Winner takes 0.02 ETH</div>
             </div>
             <a href="#" class="twitter-link">@DobbyDebates</a>
         </div>
