@@ -1,60 +1,24 @@
-from flask import Flask, render_template, jsonify, request
-from flask_socketio import SocketIO, emit
-from Dobby_Class import process_audio_and_chat
-from dobby_voice import text_to_speech, play
-import threading
-import time
-from typing import Optional
+from flask import Flask, render_template, request, has_request_context
+from flask_socketio import SocketIO
 import logging
+from services.audio_service import AudioService
+from services.chat_service import ChatService
+from services.transcription_service import TranscriptionService
+from config import AudioConfig, ChatConfig, TranscriptionConfig
+import time
+import os
 from functools import wraps
 
-# Initialize Flask
 app = Flask(__name__)
-
-# Configure SocketIO with threading mode
 socketio = SocketIO(
     app, cors_allowed_origins="*", async_mode="threading", ping_timeout=60
 )
-
 logger = logging.getLogger(__name__)
-app.config["JSON_SORT_KEYS"] = False  # Preserve response order
 
-
-def async_handler(f):
-    """Decorator for handling async operations"""
-
-    @wraps(f)
-    def wrapped(*args, **kwargs):
-        def task():
-            try:
-                return f(*args, **kwargs)
-            except Exception as e:
-                logger.error(f"Error in async task: {str(e)}")
-                socketio.emit("error", {"message": "Internal server error"})
-
-        thread = threading.Thread(target=task)
-        thread.daemon = True
-        thread.start()
-        return thread
-
-    return wrapped
-
-
-def emit_timer(seconds: int) -> None:
-    """Emit timer updates"""
-    for i in range(seconds, 0, -1):
-        socketio.emit("timer_update", {"seconds": i})
-        time.sleep(1)
-    socketio.emit("timer_update", {"seconds": 0})
-
-
-def debug_log(msg_type: str, message: str, data: dict = None) -> None:
-    """Enhanced debug logging"""
-    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-    log_msg = f"[{timestamp}] {msg_type}: {message}"
-    if data:
-        log_msg += f"\nData: {data}"
-    logger.info(log_msg)
+# Initialize services
+audio_service = AudioService(AudioConfig())
+chat_service = ChatService(ChatConfig())
+transcription_service = TranscriptionService(TranscriptionConfig())
 
 
 @app.route("/")
@@ -62,53 +26,70 @@ def index():
     return render_template("index.html")
 
 
+def ensure_request_context(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if not has_request_context():
+            with app.request_context():
+                return f(*args, **kwargs)
+        return f(*args, **kwargs)
+    return wrapper
+
 @socketio.on("start_recording")
+@ensure_request_context
 def handle_recording():
-    """Handle recording with optimized response flow"""
+    """Handle recording with improved error handling"""
+    temp_file = None
     try:
         current_topic = request.args.get("topic", "Debate this topic")
-        debug_log("INFO", "Starting recording session", {"topic": current_topic})
+        logger.info(f"Starting recording for topic: {current_topic}")
         socketio.emit("recording_started")
 
-        # Process audio and get response
-        transcription, ai_response = process_audio_and_chat(
-            prompt=f"Debate this topic briefly: {current_topic}",
-            timed_recording=True,
-            record_seconds=5,
-            is_english=True,
+        # Record audio
+        temp_file = audio_service.record_audio(timed_recording=True, record_seconds=5)
+        if not temp_file or not os.path.exists(temp_file):
+            raise Exception("Audio recording failed or file not found")
+
+        # Transcribe audio
+        transcription = transcription_service.transcribe(
+            temp_file,
+            prompt=f"Debate this topic briefly: {current_topic}"
+        )
+        if not transcription:
+            raise Exception("No transcription received")
+        logger.info(f"Transcription received: {transcription[:50]}...")
+
+        # Get AI response
+        ai_response = chat_service.send_message(
+            f"Respond to this point briefly: {transcription}"
+        )
+        if not ai_response:
+            raise Exception("No AI response received")
+        logger.info(f"AI response received: {ai_response[:50]}...")
+
+        # Emit response
+        socketio.emit(
+            "dobby_response",
+            {
+                "text": ai_response,
+                "user_said": transcription,
+                "timestamp": time.time()
+            }
         )
 
-        if transcription and ai_response:
-            debug_log(
-                "INFO",
-                "Got response",
-                {
-                    "transcription_length": len(transcription),
-                    "response_length": len(ai_response),
-                },
-            )
-            audio = text_to_speech(ai_response)
-            if audio:
-                socketio.emit(
-                    "dobby_response",
-                    {
-                        "text": ai_response,
-                        "user_said": transcription,
-                        "timestamp": time.time(),
-                    },
-                )
-                play(audio)
-        else:
-            debug_log("ERROR", "No response generated")
-
     except Exception as e:
-        debug_log("ERROR", f"Recording failed: {str(e)}")
-        socketio.emit("error", {"message": "Recording failed"})
+        error_msg = str(e)
+        logger.error(f"Recording failed: {error_msg}")
+        socketio.emit("error", {"message": f"Recording failed: {error_msg}"})
+
+    finally:
+        # Cleanup temp file
+        if temp_file and os.path.exists(temp_file):
+            try:
+                os.remove(temp_file)
+            except Exception as e:
+                logger.error(f"Failed to remove temp file: {str(e)}")
 
 
 if __name__ == "__main__":
-    try:
-        print("Starting server...")
-        socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
-    except Exception as e:
-        print(f"Server error: {e}")
+    socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
