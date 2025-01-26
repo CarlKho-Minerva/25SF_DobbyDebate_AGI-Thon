@@ -1,4 +1,3 @@
-# If API keys in env.example doesn't work, hardcode them in config.py belwo:
 
 API_KEY = ""  # Fireworks AI for Dobby
 OPENAI_API_KEY = ""

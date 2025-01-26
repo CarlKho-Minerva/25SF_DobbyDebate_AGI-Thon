@@ -12,6 +12,9 @@ app = Flask(__name__)
 socketio = SocketIO(
     app, cors_allowed_origins="*", async_mode="threading", ping_timeout=60
 )
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # Initialize services
@@ -46,16 +49,23 @@ def handle_recording():
 
         # Record audio
         temp_file = audio_service.record_audio(timed_recording=True, record_seconds=5)
-        if not temp_file or not os.path.exists(temp_file):
-            raise Exception("Audio recording failed or file not found")
+        logger.debug(f"Audio recorded to: {temp_file}")
+
+        if not temp_file:
+            raise Exception("No audio file was created")
+        if not os.path.exists(temp_file):
+            raise Exception(f"Audio file not found at: {temp_file}")
+        if os.path.getsize(temp_file) == 0:
+            raise Exception("Audio file is empty")
 
         # Transcribe audio
+        logger.debug(f"Attempting transcription of: {temp_file}")
         transcription = transcription_service.transcribe(
             temp_file,
             prompt=f"Debate this topic briefly: {current_topic}"
         )
         if not transcription:
-            raise Exception("No transcription received")
+            raise Exception("Transcription failed - no text received")
         logger.info(f"Transcription received: {transcription[:50]}...")
 
         # Get AI response
@@ -78,7 +88,7 @@ def handle_recording():
 
     except Exception as e:
         error_msg = str(e)
-        logger.error(f"Recording failed: {error_msg}")
+        logger.error(f"Recording failed: {error_msg}", exc_info=True)
         socketio.emit("error", {"message": f"Recording failed: {error_msg}"})
 
     finally:
