@@ -3,7 +3,15 @@ import wave
 import tempfile
 import pyaudio
 from typing import Optional
-from config import SAMPLE_RATE, CHANNELS, CHUNK_SIZE, FORMAT, TEMP_DIR, RECORD_SECONDS, ELEVENLABS_API_KEY
+from config import (
+    SAMPLE_RATE,
+    CHANNELS,
+    CHUNK_SIZE,
+    FORMAT,
+    TEMP_DIR,
+    RECORD_SECONDS,
+    ELEVENLABS_API_KEY,
+)
 
 
 class AudioService:
@@ -49,11 +57,7 @@ class AudioService:
                 if timed_recording:
                     for _ in range(
                         0,
-                        int(
-                            self.sample_rate
-                            / self.chunk_size
-                            * record_seconds
-                        ),
+                        int(self.sample_rate / self.chunk_size * record_seconds),
                     ):
                         data = stream.read(self.chunk_size)
                         frames.append(data)
